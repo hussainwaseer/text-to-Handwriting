@@ -1,9 +1,6 @@
 # ✍️ Text to Handwriting (React Edition)
 > The premium, zero-backend tool to transform any digital text into beautiful, handwritten A4 pages.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-
-**Live Concept Reference:** [Original Vanilla JS Version](https://saurabhdaware.github.io/text-to-handwriting/)
 
 ## 📖 What is Text to Handwriting?
 Text to Handwriting is a client-side-only React web application that converts typed or pasted text into downloadable images (or PDFs) that perfectly simulate handwriting on ruled paper. Rebuilt entirely from scratch using modern React best practices, this "Premium Edition" features a stunning glassmorphic UI, fluid dark/light modes, and a highly optimized pagination engine.
