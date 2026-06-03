@@ -65,7 +65,13 @@ const PaperPreview = forwardRef(function PaperPreview({
                     contentEditable
                     suppressContentEditableWarning
                     onPaste={handlePaste}
-                    style={{ fontFamily: font, fontSize: fontSize + 'pt', color: inkColor }}
+                    dir={font.includes('Urdu') ? 'rtl' : 'ltr'}
+                    style={{
+                        fontFamily: font,
+                        fontSize: fontSize + 'pt',
+                        color: inkColor,
+                        textAlign: font.includes('Urdu') ? 'right' : 'left'
+                    }}
                     dangerouslySetInnerHTML={undefined}
                 >
                     {LOREM}
