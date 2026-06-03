@@ -1,0 +1,21 @@
+{
+    "name": "Text to Handwriting",
+    "short_name": "Handwriting",
+    "description": "Transform your text into beautiful handwriting-style images.",
+    "theme_color": "#0d0d0d",
+    "background_color": "#0d0d0d",
+    "display": "standalone",
+    "start_url": ".",
+    "icons": [
+        {
+            "src": "icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
