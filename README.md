@@ -1,6 +1,14 @@
 # ✍️ Text to Handwriting (React Edition)
 > The premium, zero-backend tool to transform any digital text into beautiful, handwritten A4 pages.
-**[🚀 Try it live →](text-to-handwriting-vert.vercel.app)**
+>
+>
+<p align="center">
+  <strong>
+    <a href="https://text-to-handwriting-vert.vercel.app">
+      🚀 Try it live →
+    </a>
+  </strong>
+</p>
 
 
 ## 📖 What is Text to Handwriting?
