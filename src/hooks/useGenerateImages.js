@@ -3,7 +3,7 @@
 
 import { useState, useCallback } from 'react';
 import html2canvas from 'html2canvas';
-import { createPDF, contrastImage } from '../utils/helpers';
+import { createPDF, contrastImage, humanizeHandwriting } from '../utils/helpers';
 
 export function useGenerateImages() {
     const [outputImages, setOutputImages] = useState([]);
@@ -27,6 +27,8 @@ export function useGenerateImages() {
             contrastImage(imageData, 0.55);
             ctx.putImageData(imageData, 0, 0);
         }
+        // Apply human-like randomness: wave warp + ink noise + baseline jitter
+        humanizeHandwriting(canvas);
         return canvas;
     }, []);
 
