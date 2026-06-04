@@ -1,5 +1,6 @@
 // ── App.jsx — Root component, wires all state and components ──
 import React, { useState, useRef, useCallback } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import Header from './components/Header';
 import PaperPreview from './components/PaperPreview';
 import CustomizationPanel from './components/CustomizationPanel';
@@ -143,6 +144,9 @@ export default function App() {
           onAddToPaper={handleAddToPaper}
         />
       )}
+
+      {/* Vercel Analytics */}
+      <Analytics />
     </div>
   );
 }
