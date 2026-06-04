@@ -5,8 +5,6 @@ import { useState, useCallback } from 'react';
 import html2canvas from 'html2canvas';
 import { createPDF, contrastImage } from '../utils/helpers';
 
-const CLIENT_HEIGHT = 514; // height of blank A4 paper content area in px
-
 export function useGenerateImages() {
     const [outputImages, setOutputImages] = useState([]);
     const [isGenerating, setIsGenerating] = useState(false);
@@ -68,46 +66,74 @@ export function useGenerateImages() {
         const paperContentEl = paperEl.querySelector('.paper-content');
         if (!paperContentEl) { setIsGenerating(false); return; }
 
-        const savedBorder = applyStyles(paperEl, overlayEl, effect);
+        applyStyles(paperEl, overlayEl, effect);
         paperEl.scrollTo(0, 0);
 
-        const scrollHeight = paperContentEl.scrollHeight;
-        const totalPages = Math.ceil(scrollHeight / CLIENT_HEIGHT);
+        // Measure the visible page height from the actual rendered element
+        const pageHeight = paperEl.clientHeight;
+
         const newCanvases = [];
+        const initialContent = paperContentEl.innerHTML;
 
         try {
-            if (totalPages <= 1) {
+            // Tokenise the existing innerHTML into individual tokens (words + spaces)
+            const tokens = initialContent.split(/(\s+)/).filter(t => t.length > 0);
+            const totalScrollHeight = paperContentEl.scrollHeight;
+            const isMultiPage = totalScrollHeight > pageHeight + 2; // +2 px tolerance
+
+            if (!isMultiPage) {
+                // Single page — capture as-is
+                paperEl.scrollTo(0, 0);
                 const canvas = await captureCanvas(paperEl, resolution, effect);
                 newCanvases.push(canvas);
             } else {
-                const initialContent = paperContentEl.innerHTML;
-                const splitContent = initialContent.split(/(\s+)/);
-                let wordCount = 0;
+                // Multi-page: fill one page worth of content, capture, repeat
+                let tokenIndex = 0;
 
-                for (let i = 0; i < totalPages; i++) {
+                while (tokenIndex < tokens.length) {
                     paperContentEl.innerHTML = '';
-                    const wordArray = [];
-                    let wordString = '';
-                    while (paperContentEl.scrollHeight <= CLIENT_HEIGHT && wordCount <= splitContent.length) {
-                        wordString = wordArray.join(' ');
-                        wordArray.push(splitContent[wordCount]);
-                        paperContentEl.innerHTML = wordArray.join(' ');
-                        wordCount++;
+                    let pageTokens = [];
+                    let lastGood = '';
+
+                    // Accumulate tokens until the content overflows the page height
+                    while (tokenIndex < tokens.length) {
+                        pageTokens.push(tokens[tokenIndex]);
+                        paperContentEl.innerHTML = pageTokens.join('');
+
+                        if (paperContentEl.scrollHeight > pageHeight) {
+                            // This token caused overflow — step back one token
+                            pageTokens.pop();
+                            tokenIndex--;
+                            break;
+                        }
+                        lastGood = pageTokens.join('');
+                        tokenIndex++;
                     }
-                    paperContentEl.innerHTML = wordString;
-                    wordCount--;
+
+                    // If no tokens fit at all (edge case: single huge token), force-include it
+                    if (pageTokens.length === 0 && tokenIndex < tokens.length) {
+                        lastGood = tokens[tokenIndex];
+                        tokenIndex++;
+                    }
+
+                    paperContentEl.innerHTML = lastGood || pageTokens.join('');
                     paperEl.scrollTo(0, 0);
                     const canvas = await captureCanvas(paperEl, resolution, effect);
                     newCanvases.push(canvas);
-                    paperContentEl.innerHTML = initialContent;
+                    tokenIndex++;
                 }
             }
+
+            // Commit captured canvases to state (inside try so it always runs if capture succeeded)
+            if (newCanvases.length > 0) {
+                setOutputImages(prev => [...prev, ...newCanvases]);
+            }
         } finally {
+            // Always restore original content and styles
+            paperContentEl.innerHTML = initialContent;
             removeStyles(paperEl, overlayEl);
             setIsGenerating(false);
         }
-
-        setOutputImages(prev => [...prev, ...newCanvases]);
     }, [captureCanvas, isGenerating]);
 
     const deleteImage = useCallback((index) => {
